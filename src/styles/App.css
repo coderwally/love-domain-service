@@ -108,9 +108,10 @@ header{
   font-size: 18px;
   background-size: 200% 200%;
   animation: gradient-animation 4s ease infinite;
-  margin: 20px 10px;
+  margin-bottom: 20px;
   border-radius: 20px;
   padding: 0px 2rem;
+  min-width: 10rem;
 }
 
 .mint-button:disabled{
@@ -194,8 +195,14 @@ input:focus {
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 10px;
+}
 
+.row {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: center;  
+  padding:0px;
 }
 
 .tld {
@@ -203,7 +210,6 @@ input:focus {
   font-size: 20px;
   font-weight: bold;
   color: white;
-  /* left: -70px; */
   right: 22px;
   margin: 0;  
   padding: 0;
