@@ -104,12 +104,12 @@ header{
 }
 
 .mint-button {
-  background: -webkit-linear-gradient(left, #a200d6, #ff6fdf);
+  background: -webkit-linear-gradient(left, #BA4343, #522483);
   font-size: 18px;
   background-size: 200% 200%;
-  animation: gradient-animation 4s ease infinite;
+  animation: gradient-animation 5s ease infinite;
   margin-bottom: 20px;
-  border-radius: 20px;
+  border-radius: 14px;
   padding: 0px 2rem;
   min-width: 10rem;
 }
@@ -139,7 +139,6 @@ header{
 .edit-icon{
   width: 12px;
 }
-
 
 .footer-container {
   display: flex;
@@ -265,6 +264,19 @@ input:focus {
 
 .underlined:hover{
   cursor: pointer;
+}
+
+.connect-wallet-container {
+  background-color: rgb(58, 11, 70);
+  border-radius: 10px;
+}
+
+.connect-wallet-container p {
+  padding:20px 15px;
+}
+
+.connect-wallet-container button {
+  margin:20px 10px;
 }
 
 /* KeyFrames */

@@ -3,13 +3,16 @@ import './styles/App.css';
 import twitterLogo from './assets/twitter-logo.svg';
 import { ethers } from "ethers";
 import contractAbi from './utils/contractABI.json';
+import polygonLogo from './assets/polygonlogo.png';
+import ethLogo from './assets/ethlogo.png';
+import { getNetworkName } from './utils/networks';
 
 // Constants
 const TWITTER_HANDLE = '_buildspace';
 const TWITTER_LINK = `https://twitter.com/${TWITTER_HANDLE}`;
 
 const tld = '.love';
-const CONTRACT_ADDRESS = '0x8164e3aA43C6b1222A4e6BF84CCD317692861DA5';
+const CONTRACT_ADDRESS = '0xfbb2109c17c9013f3834c1a19650f2bDf6Cf1f10';
 
 const App = () => {
 	const [currentAccount, setCurrentAccount] = useState('');
@@ -17,8 +20,7 @@ const App = () => {
 	//const [loading, setLoading] = useState(false);	
 	const [website, setWebsite] = useState('');
 	const [email, setEmail] = useState('');
-	const [twitter, setTwitter] = useState('');
-	const [github, setGithub] = useState('');
+	const [network, setNetwork] = useState('');
 
   	const checkIfWalletIsConnected = async () => {
 		const { ethereum } = window;
@@ -41,7 +43,18 @@ const App = () => {
 		} else {
 			console.log('No authorized account found');
 		}
-  };
+		const chainId = await ethereum.request({ method: 'eth_chainId' });
+		const nw = getNetworkName(chainId);
+		console.log(`Current network: ${nw}`);
+		setNetwork(nw);
+	
+		ethereum.on('chainChanged', handleChainChanged);
+		
+		// Reload the page when they change networks
+		function handleChainChanged(_chainId) {
+			window.location.reload();
+		}		
+  	};
 
 	// Create a function to render if wallet is not connected yet
 	const renderNotConnectedContainer = () => (
@@ -72,8 +85,59 @@ const App = () => {
 			console.log(error)
 		}
 	}	
+
+	const switchNetwork = async () => {
+		if (window.ethereum) {
+			try {
+				// Try to switch to the Mumbai testnet
+				await window.ethereum.request({
+					method: 'wallet_switchEthereumChain',
+					params: [{
+						chainId: '0x13881'
+					}],
+				});
+			} catch (error) {
+				// This error code means that the chain we want has not been added to MetaMask
+				// In this case we ask the user to add it to their MetaMask
+				if (error.code === 4902) {
+					try {
+						await window.ethereum.request({
+							method: 'wallet_addEthereumChain',
+							params: [{
+								chainId: '0x13881',
+								chainName: 'Polygon Mumbai Testnet',
+								rpcUrls: ['https://rpc-mumbai.maticvigil.com/'],
+								nativeCurrency: {
+									name: "Mumbai Matic",
+									symbol: "MATIC",
+									decimals: 18
+								},
+								blockExplorerUrls: ["https://mumbai.polygonscan.com/"]
+							}, ],
+						});
+					} catch (error) {
+						console.log(error);
+					}
+				}
+				console.log(error);
+			}
+		} else {
+			// If window.ethereum is not found then MetaMask is not installed
+			alert('MetaMask is not installed. Please install it to use this app: https://metamask.io/download.html');
+		}
+	}
+
 	// Form to enter domain name and data
 	const renderInputForm = () =>{
+		if (network !== 'Polygon Mumbai Testnet') {
+			return (
+			  <div className="connect-wallet-container">
+				<p>Please switch to the Polygon Mumbai Testnet</p>
+				<button className='cta-button mint-button' onClick={switchNetwork}>Click here to switch</button>
+			  </div>
+			);
+		}
+
 		return (
 			<div className="form-container">
 				<div className="first-row">
@@ -106,23 +170,9 @@ const App = () => {
 					onChange={e => setEmail(e.target.value)}
 				/>
 
-				<input
-					type="text"
-					value={twitter}
-					placeholder='twitter handle'
-					onChange={e => setTwitter(e.target.value)}
-				/>
-
-				<input
-					type="text"
-					value={github}
-					placeholder='github handle'
-					onChange={e => setGithub(e.target.value)}
-				/>
-
 				<div className="button-container">
 					<button className='cta-button mint-button' disabled={null} onClick={setDomainRecord}>
-						Set data
+						Set record
 					</button>  
 				</div>
 
@@ -189,7 +239,7 @@ const App = () => {
 				const signer = provider.getSigner();
 				const contract = new ethers.Contract(CONTRACT_ADDRESS, contractAbi.abi, signer);
 
-				let tx = await contract.setRecord(domain, website, email, twitter, github);
+				let tx = await contract.setRecord(domain, website, email);
 
 				// Wait for the transaction to be mined
 				const receipt = await tx.wait();
@@ -218,9 +268,13 @@ const App = () => {
 				<div className="header-container">
 					<header>
 						<div className="left">
-						<p className="title">💜 Love Name Service</p>
-						<p className="subtitle">Your lovable API on the blockchain!</p>
+							<p className="title">💜 Love Name Service</p>
+							<p className="subtitle">Your lovable API on the blockchain!</p>
 						</div>
+						<div className="right">
+      						<img alt="Network logo" className="logo" src={ network.includes("Polygon") ? polygonLogo : ethLogo} />
+      						{ currentAccount ? <p> Wallet: {currentAccount.slice(0, 6)}...{currentAccount.slice(-4)} </p> : <p> Not connected </p> }
+    					</div>						
 					</header>
 				</div>
 
