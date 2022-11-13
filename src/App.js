@@ -292,7 +292,6 @@ const App = () => {
 				const records = await contract.getAllRecords();
 				
 				const mintRecords = await Promise.all(records.map(async (record) => {
-					console.log(record);
 					return {
 						tokenId: record.tokenId.toNumber(),
 						name: record.name,
