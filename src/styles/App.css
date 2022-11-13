@@ -253,9 +253,22 @@ input:focus {
   background-color: lightgreen;
 }
 
+.domain-label {
+  padding-bottom:10px;
+}
+
+.record-label {
+  font-size:16px;
+  font-style: italic;
+}
+
 .link{
   color: black;
   text-decoration: none;
+}
+
+.bold {
+  font-weight: bold;
 }
 
 .underlined{
